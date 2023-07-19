@@ -24,6 +24,7 @@ app.post('/todo', async(req, res) => {
             
         } catch (error) {
             console.error(error.message)
+            res.status(500).json({ error: 'Server error' });
         }
 })
 
@@ -37,6 +38,7 @@ app.get('/todo', async(req, res)=> {
             res.json(allTodo.rows)
         } catch (error) {
             console.error(error.message)
+            res.status(500).json({ error: 'Server error' });
             
         }
 })
@@ -50,10 +52,16 @@ app.get('/todo/:id', async(req, res)=> {
             "SELECT * FROM bench_todo WHERE bench_todo_id = $1", [id]
            
             )
+           if(singleTodo.rows.length === 0) {
+            res.status(404)
+            .json({error:'not found'})
+           }
             res.json(singleTodo.rows[0])
         
     } catch (error) {
-        console.error(error.message) 
+        console.error(error.message)
+        res.status(500).json({ error: 'Server error' });
+
     }
 })
 
@@ -69,6 +77,7 @@ app.put("/todo/:id", async(req, res)=> {
         res.json("todo is updated!")
     } catch (error) {
         console.error(error.message)
+        res.status(500).json({ error: 'Server error' });
     }
 })
 
@@ -82,6 +91,7 @@ app.delete("/todo/:id", async(req, res)=> {
         res.json("todo is deleted!")
     } catch (error) {
         console.error(error.message)
+        res.status(500).json({ error: 'Server error' });
     }
 })
 
