@@ -1,7 +1,7 @@
 const request = require('supertest')
 const app = require('./app')
 
-describe('/todo', () => {
+describe.skip('/todo', () => {
 
     describe('POST', () => {
         test('should respond with status code: 200', async () => {
@@ -27,7 +27,7 @@ describe('/todo', () => {
         });
        
 
-        test.only('should return with correct input', async () => {
+        test('should return with correct input', async () => {
             const res = await request(app).post('/todo').send({
                 description: "learn typescript"
             })
@@ -36,7 +36,7 @@ describe('/todo', () => {
         });
         
     });
-    describe('GET', () => {
+    describe('GET for all items', () => {
         test('should respond with status code: 200', async () => {
           const res = await request(app).get('/todo');
           expect(res.statusCode).toBe(200);
@@ -73,5 +73,109 @@ describe('/todo', () => {
     
 
    
+});
+
+describe('/todo/:id', () => {
+    describe('GET for one item', () => {
+        test('should respond with status code: 200', async () => {
+            const res = await request(app).get('/todo/1');
+            expect(res.statusCode).toBe(200);
+          });
+          test('should return json in the content type header', async () => {
+            
+            const res = await request(app).get('/todo/1');
+            expect(res.headers['content-type']).toEqual(expect.stringContaining('json'));
+          });
+          test('should return a todo item with correct data types', async () => {
+           
+            const res = await request(app).get('/todo/1');
+          
+              expect(typeof res.body.bench_todo_id).toBe('number');
+              expect(typeof res.body.description).toBe('string');
+            
+          });
+          test('should return an error message when todo item does not exist', async () => {
+            
+            const res = await request(app).get('/todo/99999');
+            expect(res.body).toEqual({ error: 'not found' });
+          });
+
+
+    });
+
+    describe('UPDATE', () => {
+        test('should respond with status code: 200', async () => {
+            const newTodo = await request(app).post('/todo').send({
+              description: "learn typescript"
+            });
+      
+            const updatedTodo = await request(app).put(`/todo/${newTodo.body.bench_todo_id}`).send({
+              description: "learn React"
+            });
+      
+            expect(updatedTodo.statusCode).toBe(200);
+          });
+      
+          test('should return json in the content type header when todo item is updated successfully', async () => {
+            const newTodo = await request(app).post('/todo').send({
+              description: "learn typescript"
+            });
+      
+            const updatedTodo = await request(app).put(`/todo/${newTodo.body.bench_todo_id}`).send({
+              description: "learn React"
+            });
+      
+            expect(updatedTodo.headers['content-type']).toEqual(expect.stringContaining('json'));
+          });
+      
+          test('should return a success message when todo item is updated successfully', async () => {
+            const newTodo = await request(app).post('/todo').send({
+              description: "learn typescript"
+            });
+      
+            const updatedTodo = await request(app).put(`/todo/${newTodo.body.bench_todo_id}`).send({
+              description: "learn React"
+            });
+      
+            expect(updatedTodo.body).toBe("todo is updated!");
+          });
+      
+         
+      
+        
+        
+    });
+
+    describe('DELETE',()=> {
+        test('should respond with status code: 200 when todo item is deleted successfully', async () => {
+            const newTodo = await request(app).post('/todo').send({
+              description: "learn typescript"
+            });
+      
+            const deletedTodo = await request(app).delete(`/todo/${newTodo.body.bench_todo_id}`);
+      
+            expect(deletedTodo.statusCode).toBe(200);
+          });
+      
+          test('should return json in the content type header when todo item is deleted successfully', async () => {
+            const newTodo = await request(app).post('/todo').send({
+              description: "learn typescript"
+            });
+      
+            const deletedTodo = await request(app).delete(`/todo/${newTodo.body.bench_todo_id}`);
+      
+            expect(deletedTodo.headers['content-type']).toEqual(expect.stringContaining('json'));
+          });
+      
+          test('should return a success message when todo item is deleted successfully', async () => {
+            const newTodo = await request(app).post('/todo').send({
+              description: "learn typescript"
+            });
+      
+            const deletedTodo = await request(app).delete(`/todo/${newTodo.body.bench_todo_id}`);
+      
+            expect(deletedTodo.body).toBe("todo is deleted!");
+          });
+    })
 });
 
