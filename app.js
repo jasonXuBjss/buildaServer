@@ -101,4 +101,16 @@ app.delete("/todo/:id", async(req, res)=> {
 
 //app.listen(port, ()=> console.log(`app listening on port ${port}`))
 
+
+// 404
+app.all("/*", (req, res) => {
+    res.status(404).send({ msg: "path not found" });
+  });
+  
+
 module.exports = app;
+
+// Check if the script is run directly, if so, start the server
+if (require.main === module) {
+    app.listen(port, () => console.log(`app listening on port ${port}`));
+  }
